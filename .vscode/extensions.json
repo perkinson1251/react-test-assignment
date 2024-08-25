@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "zhang-renyang.vscode-react",
+    "dsznajder.es7-react-js-snippets",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss"
+  ]
+}
