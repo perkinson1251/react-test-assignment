@@ -1,3 +1,4 @@
+import { Input } from '@/components/ui/Input'
 import useOutsideClick from '@/hooks/useOutsideClick'
 import { Option } from '@/types'
 import { Icon } from '@iconify/react'
@@ -10,8 +11,8 @@ interface SelectProps {
   onChange: (selected: Option[]) => void
   disabled?: boolean
   placeholder?: string
-  selectedOptions?: Option[] // New prop for selected options
-  onClear?: () => void // New prop for clear action
+  selectedOptions?: Option[] // Adjusted type
+  onClear?: () => void
 }
 
 const Select: React.FC<SelectProps> = ({
@@ -21,15 +22,14 @@ const Select: React.FC<SelectProps> = ({
   onChange,
   disabled = false,
   placeholder,
-  selectedOptions = [], // Use the selectedOptions prop
-  onClear, // Use the onClear prop
+  selectedOptions = [],
+  onClear,
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const selectRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Update internal state when selectedOptions changes
     setSearchTerm('')
   }, [selectedOptions])
 
@@ -54,13 +54,12 @@ const Select: React.FC<SelectProps> = ({
     setSearchTerm('')
   }
 
+  // Filter and sort options
+  const filteredOptions = options.filter((item) => item.label.toLowerCase().includes(searchTerm.toLowerCase()))
+
   const sortedOptions = [
     ...selectedOptions,
-    ...options.filter(
-      (item) =>
-        !selectedOptions.some((selectedItem) => selectedItem.value === item.value) &&
-        item.label.toLowerCase().includes(searchTerm.toLowerCase()),
-    ),
+    ...filteredOptions.filter((item) => !selectedOptions.some((selectedItem) => selectedItem.value === item.value)),
   ].sort((a, b) => {
     const aIsSelected = selectedOptions.some((selectedItem) => selectedItem.value === a.value)
     const bIsSelected = selectedOptions.some((selectedItem) => selectedItem.value === b.value)
@@ -72,48 +71,34 @@ const Select: React.FC<SelectProps> = ({
     handler: () => setIsOpen(false),
   })
 
+  // Determine the placeholder text
+  const getPlaceholder = () => {
+    if (isMultiSelect) {
+      return selectedOptions.length > 0 ? `Selected (${selectedOptions.length})` : placeholder || 'Select options...'
+    } else {
+      return selectedOptions.length > 0 ? selectedOptions[0].label : placeholder || 'Select option...'
+    }
+  }
+
   return (
     <div ref={selectRef} className="w-full max-w-xs">
       {label && <label className="block text-sm text-gray-medium mb-1">{label}</label>}
       <div className="relative">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder={
-              isMultiSelect && selectedOptions.length > 0
-                ? `Selected (${selectedOptions.length})`
-                : placeholder
-                  ? placeholder
-                  : isMultiSelect
-                    ? 'Select options...'
-                    : 'Select option...'
-            }
-            value={searchTerm}
-            onChange={handleSearch}
-            onClick={() => {
-              if (!disabled) {
-                setIsOpen(true)
-              }
-            }}
-            disabled={disabled}
-            className={`w-full pl-6 py-[14px] ${isOpen ? 'border-t border-x border-black' : 'border border-gray-light'}  focus:outline-none`}
-          />
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => {
-              if (!disabled) {
-                toggleDropdown()
-              }
-            }}
-            className="absolute inset-y-0 right-0 px-6 text-gray-medium"
-          >
-            <Icon icon="material-symbols:keyboard-arrow-down" />
-          </button>
-        </div>
+        <Input
+          value={searchTerm}
+          placeholder={getPlaceholder()}
+          onChange={handleSearch}
+          onClick={() => {
+            if (!disabled) setIsOpen(true)
+          }}
+          disabled={disabled}
+          icon="material-symbols:keyboard-arrow-down"
+          iconPosition="right"
+          className={isOpen ? 'border-t border-x border-black' : 'border border-gray-light'}
+        />
         {isOpen && (
           <div
-            className={`absolute z-10 w-full bg-white max-h-60 text-sm overflow-auto focus:outline-none ${isOpen && 'border-b border-x border-black'}`}
+            className={`absolute z-10 w-full bg-white max-h-60 text-sm overflow-auto border-b border-x border-black`}
           >
             {sortedOptions.map((option) => (
               <div

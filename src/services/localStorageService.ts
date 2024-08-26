@@ -77,7 +77,6 @@ class LocalStorageService {
   }
 
   static getUsers(): User[] {
-    LocalStorageService.initializeStorage()
     const users = localStorage.getItem(LocalStorageService.USERS_KEY)
     return users ? JSON.parse(users) : []
   }
@@ -86,6 +85,12 @@ class LocalStorageService {
     const users = LocalStorageService.getUsers()
     users.push(user)
     localStorage.setItem(LocalStorageService.USERS_KEY, JSON.stringify(users))
+  }
+
+  static deleteUser(userName: string): void {
+    let users = this.getUsers()
+    users = users.filter((user) => user.name !== userName)
+    localStorage.setItem('users', JSON.stringify(users))
   }
 
   static getUserByName(name: string): User | undefined {
