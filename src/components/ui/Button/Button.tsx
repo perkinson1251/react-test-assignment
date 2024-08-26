@@ -1,6 +1,8 @@
 import { forwardRef } from 'react'
 
-interface ButtonOptions {}
+interface ButtonOptions {
+  isIcon?: boolean
+}
 
 type Ref = HTMLButtonElement
 
@@ -8,11 +10,13 @@ export type ButtonProps = React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTM
   ButtonOptions
 
 const Button = forwardRef<Ref, ButtonProps>((props, ref) => {
-  const { type = 'button', children, ...rest } = props
+  const { type = 'button', children, isIcon = false, ...rest } = props
+
   return (
     <button
       ref={ref}
-      className="border border-main text-black w-[200px] font-light text-sm py-[14px] hover:bg-main active:bg-main transition-all disabled:text-main disabled:pointer-events-none disabled:cursor-default"
+      type={type}
+      className={`border border-main text-black hover:bg-main active:bg-main transition-all disabled:text-main disabled:pointer-events-none disabled:cursor-default ${isIcon ? 'p-2 flex items-center justify-center' : ' w-[200px] py-[14px] text-sm font-light'}`}
       {...rest}
     >
       {children}

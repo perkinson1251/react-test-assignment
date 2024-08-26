@@ -1,25 +1,37 @@
 import useOutsideClick from '@/hooks/useOutsideClick'
+import { Option } from '@/types'
 import { Icon } from '@iconify/react'
-import React, { useRef, useState } from 'react'
-
-interface Option {
-  label: string
-  value: string
-}
+import React, { useEffect, useRef, useState } from 'react'
 
 interface SelectProps {
-  label: string
+  label?: string
   options: Option[]
   isMultiSelect?: boolean
   onChange: (selected: Option[]) => void
+  disabled?: boolean
+  placeholder?: string
+  selectedOptions?: Option[] // New prop for selected options
+  onClear?: () => void // New prop for clear action
 }
 
-const Select: React.FC<SelectProps> = ({ label, options, isMultiSelect = false, onChange }) => {
+const Select: React.FC<SelectProps> = ({
+  label,
+  options,
+  isMultiSelect = false,
+  onChange,
+  disabled = false,
+  placeholder,
+  selectedOptions = [], // Use the selectedOptions prop
+  onClear, // Use the onClear prop
+}) => {
   const [searchTerm, setSearchTerm] = useState<string>('')
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>([])
   const [isOpen, setIsOpen] = useState<boolean>(false)
-
   const selectRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    // Update internal state when selectedOptions changes
+    setSearchTerm('')
+  }, [selectedOptions])
 
   const toggleDropdown = () => setIsOpen((prev) => !prev)
 
@@ -38,7 +50,6 @@ const Select: React.FC<SelectProps> = ({ label, options, isMultiSelect = false, 
       updatedOptions = selectedOptions.some((o) => o.value === option.value) ? [] : [option]
       setIsOpen(false)
     }
-    setSelectedOptions(updatedOptions)
     onChange(updatedOptions)
     setSearchTerm('')
   }
@@ -71,16 +82,32 @@ const Select: React.FC<SelectProps> = ({ label, options, isMultiSelect = false, 
             placeholder={
               isMultiSelect && selectedOptions.length > 0
                 ? `Selected (${selectedOptions.length})`
-                : isMultiSelect
-                  ? 'Select options...'
-                  : 'Select option...'
+                : placeholder
+                  ? placeholder
+                  : isMultiSelect
+                    ? 'Select options...'
+                    : 'Select option...'
             }
             value={searchTerm}
             onChange={handleSearch}
-            onClick={() => setIsOpen(true)}
+            onClick={() => {
+              if (!disabled) {
+                setIsOpen(true)
+              }
+            }}
+            disabled={disabled}
             className={`w-full pl-6 py-[14px] ${isOpen ? 'border-t border-x border-black' : 'border border-gray-light'}  focus:outline-none`}
           />
-          <button type="button" onClick={toggleDropdown} className="absolute inset-y-0 right-0 px-6 text-gray-medium">
+          <button
+            type="button"
+            disabled={disabled}
+            onClick={() => {
+              if (!disabled) {
+                toggleDropdown()
+              }
+            }}
+            className="absolute inset-y-0 right-0 px-6 text-gray-medium"
+          >
             <Icon icon="material-symbols:keyboard-arrow-down" />
           </button>
         </div>
