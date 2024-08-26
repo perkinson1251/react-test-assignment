@@ -12,6 +12,7 @@ interface SelectProps {
   disabled?: boolean
   placeholder?: string
   selectedOptions?: Option[]
+  isFullWidth?: boolean
   onClear?: () => void
 }
 
@@ -23,6 +24,7 @@ const Select: React.FC<SelectProps> = ({
   disabled = false,
   placeholder,
   selectedOptions = [],
+  isFullWidth = false,
   onClear,
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>('')
@@ -77,7 +79,7 @@ const Select: React.FC<SelectProps> = ({
   }
 
   return (
-    <div ref={selectRef} className="w-full max-w-xs">
+    <div ref={selectRef} className={`w-full ${isFullWidth || 'max-w-xs'}`}>
       {label && <label className="block text-sm text-gray-medium mb-1">{label}</label>}
       <div className="relative">
         <Input

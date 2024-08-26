@@ -97,6 +97,16 @@ class LocalStorageService {
     const users = LocalStorageService.getUsers()
     return users.find((user) => user.name === name)
   }
+
+  static updateUser(updatedUser: User): void {
+    const users = LocalStorageService.getUsers()
+    const userIndex = users.findIndex((user) => user.name === updatedUser.name)
+
+    if (userIndex !== -1) {
+      users[userIndex] = updatedUser
+      localStorage.setItem(LocalStorageService.USERS_KEY, JSON.stringify(users))
+    }
+  }
 }
 
 export default LocalStorageService
