@@ -11,7 +11,7 @@ interface SelectProps {
   onChange: (selected: Option[]) => void
   disabled?: boolean
   placeholder?: string
-  selectedOptions?: Option[] // Adjusted type
+  selectedOptions?: Option[]
   onClear?: () => void
 }
 
@@ -33,8 +33,6 @@ const Select: React.FC<SelectProps> = ({
     setSearchTerm('')
   }, [selectedOptions])
 
-  const toggleDropdown = () => setIsOpen((prev) => !prev)
-
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value)
     if (!isOpen) setIsOpen(true)
@@ -54,7 +52,6 @@ const Select: React.FC<SelectProps> = ({
     setSearchTerm('')
   }
 
-  // Filter and sort options
   const filteredOptions = options.filter((item) => item.label.toLowerCase().includes(searchTerm.toLowerCase()))
 
   const sortedOptions = [
@@ -71,7 +68,6 @@ const Select: React.FC<SelectProps> = ({
     handler: () => setIsOpen(false),
   })
 
-  // Determine the placeholder text
   const getPlaceholder = () => {
     if (isMultiSelect) {
       return selectedOptions.length > 0 ? `Selected (${selectedOptions.length})` : placeholder || 'Select options...'
